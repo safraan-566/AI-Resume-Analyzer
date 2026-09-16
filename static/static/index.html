@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Resume Analyzer</title>
+
+<style>
+*{box-sizing:border-box;scroll-behavior:smooth}
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f4f7fb;
+    color:#172033;
+}
+
+/* Logout Button */
+.logout-button {
+    color: #ffb4b4 !important;
+    background: rgba(220, 38, 38, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    padding: 9px 14px !important;
+    border-radius: 10px;
+    font-weight: 700 !important;
+    transition: all 0.25s ease;
+}
+/* Dark Mode Button */
+.dark-mode-button {
+    color: #cbd5e1;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.25s ease;
+}
+
+.dark-mode-button:hover {
+    color: white;
+    background: rgba(255,255,255,0.16);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255,255,255,0.08);
+}
+
+.dark-mode-button:active {
+    transform: translateY(1px) scale(0.97);
+}
+
+.logout-button:hover {
+    color: white !important;
+    background: #dc2626 !important;
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.30);
+}
+
+.logout-button:active {
+    transform: translateY(1px) scale(0.98);
+}
+.navbar{
+    position:sticky;top:0;z-index:1000;
+    background:#070b1d;color:white;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 6%;
+    box-shadow:0 4px 18px rgba(0,0,0,.12);
+}
+.nav-logo{font-size:21px;font-weight:800}
+.nav-links{display:flex;gap:26px}
+.nav-links a{color:#cbd5e1;text-decoration:none;font-weight:700}
+.nav-links a:hover,.nav-links a.active{color:white}
+.hero{
+    background:linear-gradient(135deg,#0b1228,#142554 55%,#2563eb);
+    color:white;text-align:center;padding:85px 20px 90px;
+}
+.hero-badge{
+    display:inline-block;background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.2);
+    padding:8px 16px;border-radius:30px;font-size:14px;font-weight:700;
+}
+.hero-icon{font-size:65px;margin:20px 0 5px}
+.hero h1{font-size:48px;margin:10px 0 15px}
+.hero p{max-width:760px;margin:0 auto 30px;color:#dbeafe;font-size:18px;line-height:1.7}
+.start-button,.secondary-button{
+    display:inline-block;padding:15px 28px;border-radius:12px;
+    text-decoration:none;font-weight:800;font-size:17px;
+    margin:5px;
+}
+.start-button{background:white;color:#1d4ed8}
+.secondary-button{border:1px solid rgba(255,255,255,.35);color:white}
+.start-button:hover{transform:translateY(-2px)}
+.stats{
+    max-width:1050px;margin:-35px auto 35px;padding:0 20px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:15px;position:relative;
+}
+.stat{
+    background:white;border-radius:16px;padding:22px;text-align:center;
+    box-shadow:0 10px 30px rgba(15,23,42,.1);
+}
+.stat strong{display:block;font-size:27px;color:#2563eb}
+.stat span{color:#64748b;font-size:13px}
+.features{
+    max-width:1050px;margin:35px auto;padding:0 20px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+}
+.feature-card{
+    background:white;padding:28px;border-radius:18px;text-align:center;
+    box-shadow:0 8px 25px rgba(15,23,42,.06);
+    border:1px solid #e7edf5;transition:.25s;
+}
+.feature-card:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(15,23,42,.1)}
+.feature-icon{font-size:42px}
+.feature-card p{color:#64748b;line-height:1.6}
+.container{max-width:1050px;margin:35px auto;padding:0 20px}
+.card{
+    background:white;padding:30px;border-radius:18px;margin-bottom:25px;
+    box-shadow:0 8px 28px rgba(15,23,42,.06);
+    border:1px solid #e6ebf2;
+}
+.card h2{margin-top:0;font-size:25px}
+.section-subtitle{color:#64748b;margin-top:-10px;margin-bottom:25px}
+.form-label{display:flex;align-items:center;gap:8px;font-weight:800;margin:18px 0 9px}
+.upload-area{
+    border:2px dashed #bfdbfe;border-radius:18px;padding:35px 25px;
+    text-align:center;background:#f8fbff;transition:.25s;
+}
+.upload-area:hover,.upload-area.dragover{
+    border-color:#2563eb;background:#eff6ff;transform:translateY(-2px)
+}
+.upload-icon{
+    width:70px;height:70px;margin:0 auto 15px;border-radius:18px;
+    background:#dbeafe;display:flex;align-items:center;justify-content:center;
+    font-size:34px
+}
+.upload-area h3{margin:0 0 8px;font-size:21px}
+.upload-area p{color:#64748b;line-height:1.6}
+.browse-button{
+    display:inline-block;padding:12px 22px;background:#2563eb;color:white;
+    border-radius:10px;font-weight:800;cursor:pointer
+}
+.browse-button:hover{background:#1d4ed8}
+.file-info{margin-top:15px;color:#64748b;font-size:13px}
+.file-selected{color:#15803d;font-weight:800}
+.job-box{
+    border:1px solid #d7e0ec;border-radius:16px;background:#fbfdff;
+    padding:4px;transition:.25s
+}
+.job-box:focus-within{
+    border-color:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.1)
+}
+textarea{
+    width:100%;min-height:190px;padding:16px;border:0;outline:none;
+    resize:vertical;background:transparent;font-size:15px;line-height:1.6
+}
+.job-footer{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:8px 14px 12px;color:#64748b;font-size:13px
+}
+#charCount{font-weight:700}
+.analyze-button{
+    width:100%;padding:16px;border:0;border-radius:12px;background:#2563eb;
+    color:white;font-size:17px;font-weight:800;cursor:pointer;margin-top:20px;
+    transition:.25s
+}
+.analyze-button:hover{background:#1d4ed8;transform:translateY(-1px)}
+.analyze-button:disabled{opacity:.7;cursor:not-allowed}
+.loading{display:none;text-align:center;padding:20px;font-weight:700;color:#2563eb}
+.spinner{
+    width:28px;height:28px;border:4px solid #dbeafe;border-top-color:#2563eb;
+    border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{color:#dc2626;margin-top:15px;font-weight:700}
+.results{display:none}
+.score-container{display:grid;grid-template-columns:repeat(2,1fr);gap:25px}
+.score-card{
+    background:#f8fafc;padding:30px;border-radius:16px;text-align:center;
+    border:1px solid #e2e8f0
+}
+.circle{
+    width:170px;height:170px;border-radius:50%;margin:20px auto;
+    display:flex;align-items:center;justify-content:center;position:relative;
+    background:conic-gradient(#2563eb 0deg,#e2e8f0 0deg)
+}
+.circle:before{
+    content:"";width:130px;height:130px;background:white;border-radius:50%;
+    position:absolute
+}
+.circle span{position:relative;font-size:32px;font-weight:800;color:#2563eb}
+.strength{margin-top:20px}
+.strength-title{font-size:20px;font-weight:800;margin-bottom:10px}
+.strength-bar,.match-progress{
+    width:100%;height:16px;background:#e2e8f0;border-radius:20px;overflow:hidden
+}
+.strength-fill{width:0;height:100%;background:#2563eb;transition:1s}
+.match-progress{margin-top:15px}
+.match-progress-fill{width:0;height:100%;background:#16a34a;transition:1s}
+.match-status{margin-top:20px;padding:14px;border-radius:10px;font-weight:800}
+.excellent{background:#dcfce7;color:#166534}
+.good-match{background:#dbeafe;color:#1e40af}
+.moderate{background:#ffedd5;color:#9a3412}
+.low{background:#fee2e2;color:#991b1b}
+.score-summary{
+    background:#eff6ff;border-left:5px solid #2563eb;padding:20px;
+    border-radius:12px;margin-top:25px;line-height:1.7;font-size:16px
+}
+.skill{
+    display:inline-block;padding:9px 14px;margin:5px;background:#e0e7ff;
+    color:#3730a3;border-radius:25px;font-size:14px;font-weight:700
+}
+.good{background:#ecfdf5;border-left:5px solid #16a34a;padding:13px;margin:9px 0;border-radius:8px}
+.bad{background:#fef2f2;border-left:5px solid #dc2626;padding:13px;margin:9px 0;border-radius:8px}
+.recommendation{background:#fff7ed;border-left:5px solid #f97316;padding:13px;margin:9px 0;border-radius:8px}
+.history-item{background:#f8fafc;border:1px solid #e2e8f0;padding:18px;border-radius:12px;margin-bottom:12px}
+.history-item h3{margin-top:0}
+.history-score{font-weight:800;color:#2563eb}
+.history-match{font-weight:800;color:#16a34a}
+.clear-button{background:#dc2626;margin-top:10px}
+.clear-button:hover{background:#b91c1c}
+.empty-history{color:#64748b}
+.about{line-height:1.7}
+.feature-list{padding-left:20px}.feature-list li{margin-bottom:10px}
+.download{text-align:center}
+.download button{background:#16a34a}
+.download button:hover{background:#15803d}
+.footer{text-align:center;padding:35px;color:#64748b}
+@media(max-width:800px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .features{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+    .navbar{flex-direction:column;gap:12px}
+    .nav-links{gap:15px;flex-wrap:wrap;justify-content:center}
+    .hero h1{font-size:34px}
+    .score-container{grid-template-columns:1fr}
+    .container{padding:0 12px}
+}
+
+/* Professional UI upgrade - frontend only */
+:root{--ui-primary:#2563eb;--ui-bg:#f3f6fb;--ui-muted:#64748b;--ui-shadow:0 18px 50px rgba(15,23,42,.08)}
+body{background:radial-gradient(circle at 8% 5%,rgba(37,99,235,.10),transparent 28%),radial-gradient(circle at 92% 18%,rgba(99,102,241,.08),transparent 25%),var(--ui-bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.navbar{background:rgba(7,11,29,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.08)}
+.nav-links{gap:8px}.nav-links a{padding:9px 13px;border-radius:10px;transition:.22s}.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,.09)}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#070b1d,#111c3d 52%,#2563eb);padding:90px 20px 110px}
+.hero h1{font-size:clamp(36px,5vw,58px);letter-spacing:-2px}.hero p{font-size:17px}.hero-badge{backdrop-filter:blur(10px)}
+.start-button,.secondary-button{transition:.22s}.start-button:hover,.secondary-button:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.2)}
+.stats{z-index:2;gap:16px}.stat,.feature-card,.card{background:rgba(255,255,255,.82);backdrop-filter:blur(16px);border:1px solid rgba(148,163,184,.2);box-shadow:var(--ui-shadow);transition:.25s}
+.stat{border-radius:18px}.stat:hover,.feature-card:hover,.card:hover{transform:translateY(-4px);box-shadow:0 24px 65px rgba(15,23,42,.13)}
+.feature-card{border-radius:20px}.feature-icon{width:62px;height:62px;margin:0 auto 12px;border-radius:18px;background:#dbeafe;display:flex;align-items:center;justify-content:center}
+.card{border-radius:20px}.upload-area{background:linear-gradient(180deg,#fafdff,#f3f8ff);border-radius:18px;transition:.25s}.upload-area:hover,.upload-area.dragover{box-shadow:0 12px 30px rgba(37,99,235,.10);transform:translateY(-2px)}
+.browse-button,.analyze-button{box-shadow:0 10px 24px rgba(37,99,235,.20);transition:.22s}.browse-button:hover,.analyze-button:hover{transform:translateY(-2px)}
+.job-box{background:rgba(251,253,255,.8);border-radius:16px}.job-box:focus-within{box-shadow:0 0 0 4px rgba(37,99,235,.10),0 10px 25px rgba(15,23,42,.05)}
+.results{animation:uiFadeUp .45s ease}@keyframes uiFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.score-card{background:linear-gradient(180deg,rgba(248,250,252,.95),rgba(241,245,249,.75));border-radius:18px;transition:.25s}.score-card:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(15,23,42,.07)}
+.circle{box-shadow:0 12px 30px rgba(15,23,42,.08)}
+.skill{background:#eef2ff;border:1px solid #e0e7ff;border-radius:999px;padding:8px 13px;transition:.2s}.skill:hover{transform:translateY(-2px);background:#e0e7ff}
+.good,.bad,.recommendation{border-radius:10px;transition:.2s}.good:hover,.bad:hover,.recommendation:hover{transform:translateX(3px)}
+.history-item{border-radius:13px;transition:.22s}.history-item:hover{transform:translateX(3px);border-color:#cbd5e1}
+.download{background:linear-gradient(135deg,rgba(240,253,244,.95),rgba(255,255,255,.82))}.download button,.clear-button{border:0;border-radius:11px;transition:.22s;box-shadow:0 8px 18px rgba(15,23,42,.12)}.download button:hover,.clear-button:hover{transform:translateY(-2px)}
+@media(max-width:700px){.navbar{padding:13px 4%}.nav-links{gap:3px}.nav-links a{padding:8px 10px;font-size:13px}.hero{padding:70px 18px 95px}.hero h1{font-size:36px;letter-spacing:-1.3px}.card{padding:22px 18px}.job-footer{align-items:flex-start;gap:8px;flex-direction:column}}
+@media(max-width:480px){.stats{gap:10px;padding:0 12px}.stat{padding:17px 8px}.stat strong{font-size:22px}.features{padding:0 12px}.upload-area{padding:30px 15px}}
+
+
+/* ===== VISIBLE PROFESSIONAL ANIMATIONS V2 ===== */
+html{scroll-behavior:smooth}
+
+@keyframes fadeUpV2{
+  0%{opacity:0;transform:translateY(35px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes scaleInV2{
+  0%{opacity:0;transform:scale(.72)}
+  70%{transform:scale(1.06)}
+  100%{opacity:1;transform:scale(1)}
+}
+@keyframes floatV2{
+  0%,100%{transform:translateY(0) rotate(0)}
+  50%{transform:translateY(-10px) rotate(2deg)}
+}
+@keyframes shimmerV2{
+  0%{left:-80%}
+  100%{left:130%}
+}
+@keyframes glowV2{
+  0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.15)}
+  50%{box-shadow:0 0 0 14px rgba(37,99,235,0)}
+}
+@keyframes barV2{
+  from{width:0}
+}
+@keyframes blinkV2{
+  0%,100%{opacity:1}
+  50%{opacity:.55}
+}
+
+/* Page entrance */
+.hero-badge{animation:scaleInV2 .65s ease both}
+.hero-icon{animation:floatV2 3s ease-in-out infinite}
+.hero h1{animation:fadeUpV2 .7s .12s ease both}
+.hero p{animation:fadeUpV2 .7s .24s ease both}
+.hero .start-button,.hero .secondary-button{animation:fadeUpV2 .7s .36s ease both}
+
+/* Dashboard cards */
+.stat{animation:fadeUpV2 .65s ease both}
+.stat:nth-child(2){animation-delay:.10s}
+.stat:nth-child(3){animation-delay:.20s}
+.stat:nth-child(4){animation-delay:.30s}
+
+.feature-card{animation:fadeUpV2 .7s ease both}
+.feature-card:nth-child(2){animation-delay:.12s}
+.feature-card:nth-child(3){animation-delay:.24s}
+.feature-icon{animation:floatV2 3s ease-in-out infinite}
+
+/* Upload area */
+.upload-area{transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease}
+.upload-area:hover,.upload-area.dragover{
+  transform:translateY(-5px);
+  box-shadow:0 18px 40px rgba(37,99,235,.15);
+}
+.file-selected{animation:scaleInV2 .45s ease both}
+
+/* Buttons */
+.start-button,.secondary-button,.browse-button,.analyze-button,.download button,.clear-button{
+  position:relative;
+  overflow:hidden;
+  transition:transform .25s ease,box-shadow .25s ease,filter .25s ease;
+}
+.start-button:hover,.secondary-button:hover,.browse-button:hover,.analyze-button:hover,.download button:hover,.clear-button:hover{
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 12px 28px rgba(15,23,42,.18);
+  filter:brightness(1.04);
+}
+.start-button::after,.browse-button::after,.analyze-button::after,.download button::after,.clear-button::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-80%;
+  width:45%;
+  height:100%;
+  transform:skewX(-22deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+}
+.start-button:hover::after,.browse-button:hover::after,.analyze-button:hover::after,.download button:hover::after,.clear-button:hover::after{
+  animation:shimmerV2 .65s ease;
+}
+
+/* Loading */
+.spinner{animation:spin .75s linear infinite,glowV2 1.5s ease-in-out infinite}
+
+/* Result cards */
+.results.results-visible>.card{
+  animation:fadeUpV2 .7s cubic-bezier(.2,.75,.2,1) both;
+}
+.results.results-visible>.card:nth-child(2){animation-delay:.10s}
+.results.results-visible>.card:nth-child(3){animation-delay:.20s}
+.results.results-visible>.card:nth-child(4){animation-delay:.30s}
+.results.results-visible>.card:nth-child(5){animation-delay:.40s}
+.results.results-visible>.card:nth-child(6){animation-delay:.50s}
+.results.results-visible>.card:nth-child(7){animation-delay:.60s}
+.results.results-visible>.card:nth-child(8){animation-delay:.70s}
+.results.results-visible>.card:nth-child(9){animation-delay:.80s}
+
+/* Score cards */
+.score-card{
+  transition:transform .35s ease,box-shadow .35s ease;
+}
+.score-card:hover{
+  transform:translateY(-9px) scale(1.015);
+  box-shadow:0 20px 45px rgba(15,23,42,.14);
+}
+.score-card .circle{
+  box-shadow:0 12px 30px rgba(15,23,42,.10);
+  transition:transform .4s ease,box-shadow .4s ease;
+}
+.score-card:hover .circle{
+  transform:scale(1.06);
+  box-shadow:0 18px 42px rgba(37,99,235,.18);
+}
+.circle span{animation:scaleInV2 .7s ease both}
+
+/* Progress bars visibly animate after analysis */
+.strength-fill,.match-progress-fill{
+  animation:barV2 1.5s cubic-bezier(.2,.8,.2,1) both;
+}
+
+/* Skills and result lists */
+.skill,.good,.bad,.recommendation{
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+.skill:hover{
+  transform:translateY(-5px) scale(1.04);
+  box-shadow:0 8px 18px rgba(37,99,235,.12);
+}
+.good:hover,.bad:hover,.recommendation:hover{
+  transform:translateX(8px);
+  box-shadow:0 8px 20px rgba(15,23,42,.08);
+}
+
+/* History */
+.history-item{
+  transition:transform .3s ease,box-shadow .3s ease;
+}
+.history-item:hover{
+  transform:translateX(8px);
+  box-shadow:0 12px 28px rgba(15,23,42,.10);
+}
+
+/* Sections softly reveal when navigated to */
+#analyze,#history,#about{scroll-margin-top:90px}
+
+/* Accessibility */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+
+
+/* ===== FINAL PROFESSIONAL MOTION SYSTEM ===== */
+:root{
+  --motion-ease:cubic-bezier(.22,.8,.22,1);
+  --glass:rgba(255,255,255,.72);
+  --ring:rgba(37,99,235,.18);
+}
+body{overflow-x:hidden}
+body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;filter:blur(2px);opacity:.55}
+body::before{width:360px;height:360px;left:-180px;top:28%;background:radial-gradient(circle,rgba(37,99,235,.16),transparent 68%);animation:ambientFloat 12s ease-in-out infinite}
+body::after{width:420px;height:420px;right:-210px;bottom:8%;background:radial-gradient(circle,rgba(99,102,241,.13),transparent 68%);animation:ambientFloat 15s 2s ease-in-out infinite reverse}
+@keyframes ambientFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(30px,-35px,0)}}
+.nav-logo{position:relative;transition:transform .3s var(--motion-ease)}
+.nav-logo:hover{transform:translateY(-2px) scale(1.02)}
+.nav-logo::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:2px;border-radius:10px;background:linear-gradient(90deg,transparent,#60a5fa,transparent);transform:scaleX(0);transition:transform .35s var(--motion-ease)}
+.nav-logo:hover::after{transform:scaleX(1)}
+.nav-links a{position:relative}
+.nav-links a::after{content:"";position:absolute;left:14px;right:14px;bottom:4px;height:2px;border-radius:5px;background:#60a5fa;transform:scaleX(0);transform-origin:center;transition:transform .3s var(--motion-ease)}
+.nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1)}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.hero::before{width:260px;height:260px;left:6%;top:12%;background:radial-gradient(circle,rgba(96,165,250,.18),transparent 65%);animation:heroOrb 8s ease-in-out infinite}
+.hero::after{width:320px;height:320px;right:5%;bottom:-20%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 65%);animation:heroOrb 10s 1s ease-in-out infinite reverse}
+@keyframes heroOrb{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(20px,-25px,0) scale(1.08)}}
+.hero-badge{animation:badgeIn .8s var(--motion-ease) both,softGlow 3s 1s ease-in-out infinite}
+@keyframes badgeIn{from{opacity:0;transform:translateY(14px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes softGlow{0%,100%{box-shadow:0 0 0 rgba(96,165,250,0)}50%{box-shadow:0 0 28px rgba(96,165,250,.18)}}
+.hero-icon{animation:robotFloat 3.4s ease-in-out infinite,robotIn .9s .15s var(--motion-ease) both}
+@keyframes robotFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(3deg)}}
+@keyframes robotIn{from{opacity:0;transform:scale(.5)}to{opacity:1}}
+.start-button,.secondary-button{will-change:transform}
+.start-button:active,.secondary-button:active,.browse-button:active,.analyze-button:active,.download button:active,.clear-button:active{transform:translateY(1px) scale(.98)!important}
+.ripple{position:absolute;border-radius:50%;transform:scale(0);animation:ripple .65s linear;background:rgba(255,255,255,.45);pointer-events:none}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+.stat,.feature-card,.card{will-change:transform}
+.stat strong{transition:transform .3s var(--motion-ease),letter-spacing .3s}
+.stat:hover strong{transform:scale(1.08);letter-spacing:.5px}
+.feature-card .feature-icon{transition:transform .4s var(--motion-ease),box-shadow .4s}
+.feature-card:hover .feature-icon{transform:translateY(-6px) rotate(-4deg) scale(1.08);box-shadow:0 14px 28px rgba(37,99,235,.16)}
+.upload-icon{transition:transform .4s var(--motion-ease),box-shadow .4s}
+.upload-area:hover .upload-icon,.upload-area.dragover .upload-icon{transform:translateY(-5px) rotate(-4deg) scale(1.06);box-shadow:0 12px 25px rgba(37,99,235,.15)}
+.upload-area.dragover{animation:dropPulse 1s ease-in-out infinite}
+@keyframes dropPulse{50%{box-shadow:0 0 0 8px rgba(37,99,235,.07),0 18px 40px rgba(37,99,235,.16)}}
+.file-selected{animation:filePop .5s var(--motion-ease) both}
+@keyframes filePop{0%{opacity:0;transform:translateY(8px) scale(.96)}70%{transform:translateY(-2px) scale(1.02)}100%{opacity:1;transform:none}}
+.analyze-button{background-size:200% 100%;background-image:linear-gradient(110deg,#1d4ed8,#2563eb,#3b82f6,#2563eb);animation:buttonGradient 5s linear infinite}
+@keyframes buttonGradient{to{background-position:200% 0}}
+.analyze-button:disabled{animation:none}
+.loading{animation:loadingIn .35s var(--motion-ease) both}
+@keyframes loadingIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.loading::after{content:"";display:block;width:70px;height:3px;margin:10px auto 0;border-radius:10px;background:linear-gradient(90deg,transparent,#2563eb,transparent);background-size:200% 100%;animation:loadingLine 1.2s linear infinite}
+@keyframes loadingLine{to{background-position:200% 0}}
+.results.results-visible .score-card{animation:resultCardIn .75s var(--motion-ease) both}
+.results.results-visible .score-card:nth-child(2){animation-delay:.12s}
+@keyframes resultCardIn{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:none}}
+.score-card{position:relative;overflow:hidden}
+.score-card::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.55),transparent 75%);transform:translateX(-120%);transition:transform .8s ease;pointer-events:none}
+.score-card:hover::before{transform:translateX(120%)}
+.circle{will-change:transform}
+.circle.score-complete{animation:ringComplete .7s var(--motion-ease) both}
+@keyframes ringComplete{0%{transform:scale(.92)}55%{transform:scale(1.08)}100%{transform:scale(1)}}
+.circle span{will-change:transform}
+.strength-fill,.match-progress-fill{position:relative;overflow:hidden}
+.strength-fill::after,.match-progress-fill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-100%);animation:barShine 1.3s .35s ease both}
+@keyframes barShine{to{transform:translateX(100%)}}
+.skill{will-change:transform}
+.item-reveal{animation:itemReveal .45s var(--motion-ease) both}
+@keyframes itemReveal{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+.good,.bad,.recommendation{position:relative;overflow:hidden}
+.good::before,.bad::before,.recommendation::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;transform:scaleY(0);transform-origin:top;transition:transform .35s var(--motion-ease)}
+.good:hover::before,.bad:hover::before,.recommendation:hover::before{transform:scaleY(1)}
+.history-item{will-change:transform}
+.history-item.item-reveal{animation-delay:var(--delay,0s)}
+.download button{animation:downloadReady 3s ease-in-out infinite}
+@keyframes downloadReady{0%,100%{box-shadow:0 8px 18px rgba(15,23,42,.12)}50%{box-shadow:0 8px 28px rgba(22,163,74,.22)}}
+.footer p:first-child{transition:transform .3s}
+.footer:hover p:first-child{transform:translateY(-2px)}
+.scroll-top{position:fixed;right:22px;bottom:22px;width:46px;height:46px;border:0;border-radius:50%;background:#2563eb;color:white;font-size:20px;cursor:pointer;display:grid;place-items:center;box-shadow:0 12px 28px rgba(37,99,235,.28);opacity:0;visibility:hidden;transform:translateY(12px);transition:all .3s var(--motion-ease);z-index:1200}
+.scroll-top.show{opacity:1;visibility:visible;transform:none}
+.scroll-top:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 18px 34px rgba(37,99,235,.34)}
+.reveal-on-scroll{opacity:0;transform:translateY(26px);transition:opacity .7s var(--motion-ease),transform .7s var(--motion-ease)}
+.reveal-on-scroll.visible{opacity:1;transform:none}
+@media(max-width:700px){.scroll-top{right:14px;bottom:14px}.hero::before{left:-100px}.hero::after{right:-120px}}
+@media(prefers-reduced-motion:reduce){body::before,body::after,.hero::before,.hero::after,.hero-badge,.hero-icon,.analyze-button,.download button{animation:none!important}.reveal-on-scroll{opacity:1;transform:none;transition:none}}
+
+/* ===== DARK MODE ===== */
+
+body.dark-mode {
+    background:
+        radial-gradient(circle at 8% 5%, rgba(37,99,235,.12), transparent 28%),
+        radial-gradient(circle at 92% 18%, rgba(99,102,241,.10), transparent 25%),
+        #0b1120;
+
+    color: #e5e7eb;
+}
+
+/* Cards */
+body.dark-mode .stat,
+body.dark-mode .feature-card,
+body.dark-mode .card {
+    background: rgba(15,23,42,.88);
+    color: #e5e7eb;
+    border-color: rgba(148,163,184,.15);
+    box-shadow: 0 18px 50px rgba(0,0,0,.30);
+}
+
+/* Card headings */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3 {
+    color: #f8fafc;
+}
+
+/* Normal text */
+body.dark-mode p,
+body.dark-mode .section-subtitle,
+body.dark-mode .file-info,
+body.dark-mode .empty-history {
+    color: #94a3b8;
+}
+
+/* Upload area */
+body.dark-mode .upload-area {
+    background: linear-gradient(
+        180deg,
+        rgba(15,23,42,.95),
+        rgba(17,24,39,.95)
+    );
+
+    border-color: #334155;
+}
+
+body.dark-mode .upload-area:hover,
+body.dark-mode .upload-area.dragover {
+    background: #172554;
+    border-color: #3b82f6;
+}
+
+/* Upload icon */
+body.dark-mode .upload-icon {
+    background: #1e3a8a;
+}
+
+/* Job description */
+body.dark-mode .job-box {
+    background: rgba(15,23,42,.85);
+    border-color: #334155;
+}
+
+body.dark-mode textarea {
+    color: #e5e7eb;
+}
+
+body.dark-mode textarea::placeholder {
+    color: #64748b;
+}
+
+/* Score cards */
+body.dark-mode .score-card {
+    background: linear-gradient(
+        180deg,
+        rgba(30,41,59,.95),
+        rgba(15,23,42,.90)
+    );
+
+    border-color: #334155;
+}
+
+/* Score circle inner area */
+body.dark-mode .circle:before {
+    background: #0f172a;
+}
+
+/* Score text */
+body.dark-mode .circle span {
+    color: #60a5fa;
+}
+
+/* Progress bars */
+body.dark-mode .strength-bar,
+body.dark-mode .match-progress {
+    background: #334155;
+}
+
+/* Summary */
+body.dark-mode .score-summary {
+    background: rgba(30,58,138,.25);
+    border-left-color: #3b82f6;
+    color: #dbeafe;
+}
+
+/* Skills */
+body.dark-mode .skill {
+    background: rgba(49,46,129,.35);
+    border-color: #3730a3;
+    color: #c7d2fe;
+}
+
+/* History */
+body.dark-mode .history-item {
+    background: rgba(15,23,42,.75);
+    border-color: #334155;
+}
+
+/* Job match statuses */
+body.dark-mode .excellent {
+    background: rgba(22,101,52,.30);
+    color: #86efac;
+}
+
+body.dark-mode .good-match {
+    background: rgba(30,64,175,.30);
+    color: #93c5fd;
+}
+
+body.dark-mode .moderate {
+    background: rgba(154,52,18,.30);
+    color: #fdba74;
+}
+
+body.dark-mode .low {
+    background: rgba(153,27,27,.30);
+    color: #fca5a5;
+}
+
+/* Strength / weakness / recommendation */
+body.dark-mode .good {
+    background: rgba(22,101,52,.20);
+    color: #bbf7d0;
+}
+
+body.dark-mode .bad {
+    background: rgba(153,27,27,.20);
+    color: #fecaca;
+}
+
+body.dark-mode .recommendation {
+    background: rgba(154,52,18,.20);
+    color: #fed7aa;
+}
+
+/* Download card */
+body.dark-mode .download {
+    background: linear-gradient(
+        135deg,
+        rgba(20,83,45,.30),
+        rgba(15,23,42,.90)
+    );
+}
+
+/* Footer */
+body.dark-mode .footer {
+    color: #64748b;
+}
+
+/* Dark mode button */
+body.dark-mode .dark-mode-button {
+    background: rgba(255,255,255,.14);
+    color: #f8fafc;
+}
+
+/* Smooth transition */
+body,
+.stat,
+.feature-card,
+.card,
+.score-card,
+.upload-area,
+.job-box,
+.history-item,
+.download,
+.skill,
+.good,
+.bad,
+.recommendation {
+    transition:
+        background .35s ease,
+        color .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease;
+}
+
+
+/* ===== PROFESSIONAL ANALYSIS LOADER ===== */
+.analysis-loader{width:92px;height:92px;margin:4px auto 16px;position:relative;display:grid;place-items:center}
+.loader-ring{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(37,99,235,.12);border-top-color:#2563eb;border-right-color:#60a5fa;animation:analysisSpin 1s linear infinite;box-shadow:0 0 28px rgba(37,99,235,.12)}
+.loader-icon{width:62px;height:62px;border-radius:20px;display:grid;place-items:center;font-size:30px;background:linear-gradient(135deg,#dbeafe,#eff6ff);animation:analysisPulse 1.6s ease-in-out infinite}
+@keyframes analysisSpin{to{transform:rotate(360deg)}}
+@keyframes analysisPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.loading h3{margin:4px 0 6px;font-size:21px}
+.loading p#analysisStatus{margin:0 0 16px;color:#64748b;font-weight:600}
+.analysis-progress{width:min(560px,90%);height:10px;margin:0 auto 18px;border-radius:999px;overflow:hidden;background:#e2e8f0}
+.analysis-progress-fill{width:8%;height:100%;border-radius:999px;background:linear-gradient(90deg,#2563eb,#60a5fa,#2563eb);background-size:200% 100%;transition:width .55s cubic-bezier(.22,.8,.22,1);animation:progressShine 1.4s linear infinite}
+@keyframes progressShine{to{background-position:200% 0}}
+.analysis-steps{width:min(760px,100%);margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.analysis-step{padding:11px 8px;border-radius:12px;background:rgba(148,163,184,.09);color:#94a3b8;font-size:12px;font-weight:800;border:1px solid rgba(148,163,184,.14);transition:all .35s ease}
+.analysis-step span{display:block;font-size:18px;margin-bottom:4px;filter:grayscale(1)}
+.analysis-step.active{color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.10)}
+.analysis-step.active span{filter:none;animation:stepBounce .7s ease}
+.analysis-step.done{color:#15803d;background:#ecfdf5;border-color:#bbf7d0}
+.analysis-step.done span{filter:none}
+@keyframes stepBounce{0%{transform:scale(.7)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+body.dark-mode .loader-icon{background:linear-gradient(135deg,#172554,#1e3a8a)}
+body.dark-mode .loader-ring{border-color:rgba(96,165,250,.16);border-top-color:#60a5fa;border-right-color:#93c5fd}
+body.dark-mode .loading p#analysisStatus{color:#94a3b8}
+body.dark-mode .analysis-progress{background:#334155}
+body.dark-mode .analysis-step{background:rgba(30,41,59,.65);border-color:#334155;color:#64748b}
+body.dark-mode .analysis-step.active{color:#93c5fd;background:rgba(30,64,175,.30);border-color:#3b82f6}
+body.dark-mode .analysis-step.done{color:#86efac;background:rgba(22,101,52,.25);border-color:#166534}
+@media(max-width:700px){.analysis-steps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.analysis-step{font-size:11px;padding:9px 5px}}
+
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="nav-logo">📄 AI Resume Analyzer</div>
+    <div class="nav-links">
+    <a href="#home">Home</a>
+    <a href="#analyze">Analyze</a>
+    <a href="#history">History</a>
+    <a href="#about">About</a>
+
+    <button class="dark-mode-button" id="darkModeBtn">
+        🌙 Dark
+    </button>
+
+    <a href="/logout" class="logout-button">🚪 Logout</a>
+</div>
+</nav>
+
+<section class="hero" id="home">
+    <div class="hero-badge">✨ AI-POWERED RESUME ANALYSIS</div>
+    <div class="hero-icon">🤖</div>
+    <h1>Make Your Resume Stand Out</h1>
+    <p>Analyze your resume, compare it with a job description, discover missing skills and get useful recommendations to improve your chances of getting noticed.</p>
+    <a href="#analyze" class="start-button">🚀 Analyze My Resume</a>
+    <a href="#about" class="secondary-button">▶ How It Works</a>
+</section>
+
+<section class="stats">
+    <div class="stat"><strong>AI</strong><span>Smart Analysis</span></div>
+    <div class="stat"><strong>100%</strong><span>Easy to Use</span></div>
+    <div class="stat"><strong>PDF</strong><span>Report Download</span></div>
+    <div class="stat"><strong>24/7</strong><span>Available</span></div>
+</section>
+
+<section class="features">
+    <div class="feature-card"><div class="feature-icon">📊</div><h3>Resume Score</h3><p>Get an overall score that helps you understand the quality and structure of your resume.</p></div>
+    <div class="feature-card"><div class="feature-icon">🎯</div><h3>Job Match</h3><p>Compare your resume with a job description and discover how closely they match.</p></div>
+    <div class="feature-card"><div class="feature-icon">💡</div><h3>Smart Suggestions</h3><p>Find missing skills and receive practical recommendations for improvement.</p></div>
+</section>
+
+<div class="container">
+
+<div class="card" id="analyze">
+    <h2>📤 Analyze Your Resume</h2>
+    <p class="section-subtitle">Upload your resume and provide the target job description for an AI-powered analysis.</p>
+
+    <div class="form-label">📄 Resume File</div>
+
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📄</div>
+        <h3>Upload Your Resume</h3>
+        <p>Drag & drop your resume here<br>or choose a file from your computer</p>
+        <label class="browse-button" for="resume">📁 Browse Resume</label>
+        <input type="file" id="resume" accept=".pdf,.docx" hidden>
+        <div class="file-info" id="fileInfo">PDF or DOCX • Your resume stays private</div>
+    </div>
+
+    <div class="form-label">🎯 Target Job Description</div>
+
+    <div class="job-box">
+        <textarea id="job" maxlength="3000" placeholder="Paste the job description here...
+
+Example:
+Python Developer
+Required skills: Python, FastAPI, SQL, REST APIs, Git..."></textarea>
+        <div class="job-footer">
+            <span>💡 Tip: Include the complete job description for better matching.</span>
+            <span id="charCount">0 / 3000</span>
+        </div>
+    </div>
+
+    <button class="analyze-button" id="analyzeButton" onclick="analyze()">🔍 Analyze Resume</button>
+
+    <div class="loading" id="loading">
+        <div class="analysis-loader">
+            <div class="loader-ring"></div>
+            <div class="loader-icon">🤖</div>
+        </div>
+        <h3>AI is analyzing your resume</h3>
+        <p id="analysisStatus">Reading your resume...</p>
+        <div class="analysis-progress">
+            <div class="analysis-progress-fill" id="analysisProgressFill"></div>
+        </div>
+        <div class="analysis-steps">
+            <div class="analysis-step active" id="step1"><span>📄</span>Reading Resume</div>
+            <div class="analysis-step" id="step2"><span>🛠️</span>Extracting Skills</div>
+            <div class="analysis-step" id="step3"><span>🎯</span>Comparing Job</div>
+            <div class="analysis-step" id="step4"><span>📊</span>Calculating Score</div>
+        </div>
+    </div>
+    <div class="error" id="error"></div>
+</div>
+
+<div class="results" id="results">
+
+<div class="card">
+<h2>📊 Resume Dashboard</h2>
+<div class="score-container">
+
+<div class="score-card">
+<h3>Resume Score</h3>
+<div class="circle" id="resumeCircle"><span id="resumeScore">0</span></div>
+<p>Out of 100</p>
+<div class="strength">
+<div class="strength-title">Resume Strength</div>
+<div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+<div class="strength-status" id="strengthStatus">Waiting for analysis...</div>
+</div>
+</div>
+
+<div class="score-card">
+<h3>Job Match</h3>
+<div class="circle" id="jobCircle"><span id="jobMatch">0%</span></div>
+<p>Match percentage</p>
+<div class="match-progress"><div class="match-progress-fill" id="matchProgressFill"></div></div>
+<p id="matchProgressText">Job Match Progress</p>
+<div class="match-status" id="matchStatus">Waiting for analysis...</div>
+</div>
+
+</div>
+<div class="score-summary" id="scoreSummary">Your analysis summary will appear here.</div>
+</div>
+
+<div class="card"><h2>🛠️ Skills Analysis</h2><h3>🎯 Job Required Skills</h3><div id="jobRequiredSkills"></div><h3>✅ Matching Skills</h3><div id="matchingSkills"></div><h3>❌ Missing Skills</h3><div id="missingSkills"></div></div>
+
+<div class="card"><h2>📑 Resume Sections</h2><h3>Found Sections</h3><div id="foundSections"></div><h3>Missing Sections</h3><div id="missingSections"></div></div>
+
+<div class="card"><h2>✅ Strengths</h2><div id="strengths"></div></div>
+<div class="card"><h2>⚠️ Weaknesses</h2><div id="weaknesses"></div></div>
+<div class="card"><h2>💡 Recommendations</h2><div id="recommendations"></div></div>
+<div class="card"><h2>✨ Resume Improvements</h2><div id="improvements"></div></div>
+
+<div class="card download">
+<h2>📄 Download Your Report</h2>
+<p>Save your resume analysis as a PDF.</p>
+<button onclick="downloadReport()">⬇️ Download PDF Report</button>
+</div>
+
+</div>
+
+<div class="card" id="history">
+<h2>📚 Resume Analysis History</h2>
+<div id="historyList"></div>
+<button class="clear-button" onclick="clearHistory()">🗑️ Clear History</button>
+</div>
+
+<div class="card about" id="about">
+<h2>ℹ️ About This App</h2>
+<p>AI Resume Analyzer is a web application built using Python, FastAPI, HTML, CSS and JavaScript.</p>
+<h3>🚀 What This App Can Do</h3>
+<ul class="feature-list">
+<li>📄 Read PDF and DOCX resumes</li>
+<li>📊 Calculate resume score</li>
+<li>🎯 Calculate job match percentage</li>
+<li>🛠️ Detect important skills</li>
+<li>❌ Find missing skills</li>
+<li>💡 Give recommendations</li>
+<li>✨ Suggest resume improvements</li>
+<li>📚 Store analysis history</li>
+<li>📥 Create PDF report</li>
+</ul>
+</div>
+
+</div>
+
+<div class="footer">
+<p>AI Resume Analyzer © 2026</p>
+<p>Built with Python • FastAPI • HTML • CSS • JavaScript</p>
+</div>
+
+<button class="scroll-top" id="scrollTop" aria-label="Back to top">↑</button>
+
+<script>
+const resumeInput=document.getElementById("resume");
+const uploadArea=document.getElementById("uploadArea");
+const fileInfo=document.getElementById("fileInfo");
+const jobInput=document.getElementById("job");
+const charCount=document.getElementById("charCount");
+
+resumeInput.addEventListener("change",function(){
+    if(this.files.length>0){
+        fileInfo.textContent="✅ "+this.files[0].name;
+        fileInfo.classList.add("file-selected");
+    }
+});
+
+["dragenter","dragover"].forEach(eventName=>{
+    uploadArea.addEventListener(eventName,e=>{
+        e.preventDefault();uploadArea.classList.add("dragover");
+    });
+});
+["dragleave","drop"].forEach(eventName=>{
+    uploadArea.addEventListener(eventName,e=>{
+        e.preventDefault();uploadArea.classList.remove("dragover");
+    });
+});
+uploadArea.addEventListener("drop",e=>{
+    const files=e.dataTransfer.files;
+    if(files.length){
+        resumeInput.files=files;
+        fileInfo.textContent="✅ "+files[0].name;
+        fileInfo.classList.add("file-selected");
+    }
+});
+
+jobInput.addEventListener("input",()=>{
+    charCount.textContent=jobInput.value.length+" / 3000";
+});
+
+
+function animateNumber(element,start,end,duration,suffix=""){
+    const startTime=performance.now();
+    function tick(now){
+        const progress=Math.min((now-startTime)/duration,1);
+        const eased=1-Math.pow(1-progress,3);
+        const value=Math.round(start+(end-start)*eased);
+        element.innerText=value+suffix;
+        if(progress<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+}
+
+function animateCircle(circle,percent,fromColor,toColor){
+    const duration=1200;
+    const startTime=performance.now();
+    function tick(now){
+        const progress=Math.min((now-startTime)/duration,1);
+        const eased=1-Math.pow(1-progress,3);
+        const degrees=percent*3.6*eased;
+        circle.style.background=`conic-gradient(${toColor} ${degrees}deg,#e2e8f0 ${degrees}deg)`;
+        if(progress<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+}
+
+async function analyze(){
+    const file=resumeInput.files[0];
+    const job=jobInput.value;
+    const errorBox=document.getElementById("error");
+    const loading=document.getElementById("loading");
+    const results=document.getElementById("results");
+    const analyzeButton=document.getElementById("analyzeButton");
+
+    errorBox.innerText="";
+    if(!file){errorBox.innerText="Please upload your resume.";return;}
+    if(!job.trim()){errorBox.innerText="Please enter the job description.";return;}
+
+    const formData=new FormData();
+    formData.append("file",file);
+    formData.append("job_description",job);
+
+    loading.style.display="block";
+    startAnalysisAnimation();
+    results.classList.remove("results-visible");
+    results.style.display="none";
+    analyzeButton.disabled=true;
+
+    try{
+        const response=await fetch("/analyze",{method:"POST",body:formData});
+        const data=await response.json();
+
+        if(!response.ok||data.error){
+            errorBox.innerText=data.error||"Unable to analyze resume.";
+            loading.style.display="none";
+            stopAnalysisAnimation();
+            analyzeButton.disabled=false;
+            return;
+        }
+
+        const resumeScore=Number(data.resume_score)||0;
+        const jobMatch=Number(data.job_match_percentage)||0;
+
+        const resumeScoreEl=document.getElementById("resumeScore");
+        const jobMatchEl=document.getElementById("jobMatch");
+        const resumeCircle=document.getElementById("resumeCircle");
+        const jobCircle=document.getElementById("jobCircle");
+        const strengthFill=document.getElementById("strengthFill");
+        const matchProgressFill=document.getElementById("matchProgressFill");
+
+        resumeScoreEl.innerText="0";
+        jobMatchEl.innerText="0%";
+        strengthFill.style.width="0%";
+        matchProgressFill.style.width="0%";
+        resumeCircle.style.background="conic-gradient(#2563eb 0deg,#e2e8f0 0deg)";
+        jobCircle.style.background="conic-gradient(#16a34a 0deg,#e2e8f0 0deg)";
+
+        animateNumber(resumeScoreEl,0,resumeScore,1200,"");
+        animateNumber(jobMatchEl,0,jobMatch,1200,"%");
+        animateCircle(resumeCircle,resumeScore,0,"#2563eb");
+        animateCircle(jobCircle,jobMatch,0,"#16a34a");
+
+        setTimeout(()=>{
+            strengthFill.style.width=resumeScore+"%";
+            matchProgressFill.style.width=jobMatch+"%";
+        },150);
+
+        const strengthStatus=document.getElementById("strengthStatus");
+        if(resumeScore>=80) strengthStatus.innerText="🟢 Excellent Resume";
+        else if(resumeScore>=60) strengthStatus.innerText="🔵 Good Resume";
+        else if(resumeScore>=40) strengthStatus.innerText="🟠 Needs Improvement";
+        else strengthStatus.innerText="🔴 Poor Resume";
+
+        document.getElementById("matchProgressFill").style.width=jobMatch+"%";
+        document.getElementById("matchProgressText").innerText="Job Match Progress: "+jobMatch+"%";
+
+        const matchStatus=document.getElementById("matchStatus");
+        matchStatus.className="match-status";
+        if(jobMatch>=80){matchStatus.innerText="🟢 Excellent Match";matchStatus.classList.add("excellent")}
+        else if(jobMatch>=60){matchStatus.innerText="🔵 Good Match";matchStatus.classList.add("good-match")}
+        else if(jobMatch>=40){matchStatus.innerText="🟠 Moderate Match";matchStatus.classList.add("moderate")}
+        else{matchStatus.innerText="🔴 Low Match";matchStatus.classList.add("low")}
+
+        let summary;
+        if(resumeScore>=80&&jobMatch>=80)
+            summary=`Excellent! Your resume scored <strong>${resumeScore}/100</strong> and has a <strong>${jobMatch}%</strong> match with this job. Your resume is strongly aligned with the job requirements.`;
+        else if(resumeScore>=60&&jobMatch>=60)
+            summary=`Good work! Your resume scored <strong>${resumeScore}/100</strong> and has a <strong>${jobMatch}%</strong> match with this job. Review the missing skills and recommendations to improve your application.`;
+        else if(jobMatch>=60)
+            summary=`Your resume has a <strong>${jobMatch}%</strong> job match, but the overall resume score is <strong>${resumeScore}/100</strong>. Consider improving the resume structure and content.`;
+        else
+            summary=`Your resume scored <strong>${resumeScore}/100</strong> with a <strong>${jobMatch}%</strong> job match. Focus on the missing skills and recommendations to improve your results.`;
+
+        document.getElementById("scoreSummary").innerHTML=summary;
+
+        showItems("jobRequiredSkills",data.job_required_skills,"skill");
+        showItems("matchingSkills",data.matching_skills,"skill");
+        showItems("missingSkills",data.missing_skills,"skill");
+        showItems("foundSections",data.found_sections,"good");
+        showItems("missingSections",data.missing_sections,"bad");
+        showItems("strengths",data.strengths,"good");
+        showItems("weaknesses",data.weaknesses,"bad");
+        showItems("recommendations",data.recommendations,"recommendation");
+        showItems("improvements",data.improvements,"recommendation");
+
+        saveHistory(file.name,resumeScore,jobMatch);
+
+        loading.style.display="none";
+        stopAnalysisAnimation();
+        analyzeButton.disabled=false;
+        results.style.display="block";
+        requestAnimationFrame(()=>results.classList.add("results-visible"));
+        results.scrollIntoView({behavior:"smooth"});
+    }catch(error){
+        console.error(error);
+        loading.style.display="none";
+        stopAnalysisAnimation();
+        analyzeButton.disabled=false;
+        errorBox.innerText="Unable to analyze resume. Please try again.";
+    }
+}
+
+
+let analysisTimer=null;
+let analysisStage=0;
+
+function setAnalysisStage(stage){
+    const statuses=[
+        "Reading your resume...",
+        "Extracting skills from your resume...",
+        "Comparing your resume with the job...",
+        "Calculating your final score..."
+    ];
+    const progress=[10,38,68,90];
+    const status=document.getElementById("analysisStatus");
+    const bar=document.getElementById("analysisProgressFill");
+    if(status) status.innerText=statuses[stage];
+    if(bar) bar.style.width=progress[stage]+"%";
+    for(let i=1;i<=4;i++){
+        const step=document.getElementById("step"+i);
+        if(!step) continue;
+        step.classList.remove("active","done");
+        if(i-1<stage) step.classList.add("done");
+        if(i-1===stage) step.classList.add("active");
+    }
+}
+
+function startAnalysisAnimation(){
+    analysisStage=0;
+    setAnalysisStage(0);
+    clearInterval(analysisTimer);
+    analysisTimer=setInterval(()=>{
+        if(analysisStage<3){
+            analysisStage++;
+            setAnalysisStage(analysisStage);
+        }
+    },850);
+}
+
+function stopAnalysisAnimation(){
+    clearInterval(analysisTimer);
+    analysisTimer=null;
+    const bar=document.getElementById("analysisProgressFill");
+    if(bar) bar.style.width="100%";
+    for(let i=1;i<=4;i++){
+        const step=document.getElementById("step"+i);
+        if(step){step.classList.remove("active");step.classList.add("done");}
+    }
+    const status=document.getElementById("analysisStatus");
+    if(status) status.innerText="Analysis complete! Preparing your results...";
+}
+
+function showItems(elementId,items,className){
+    const element=document.getElementById(elementId);
+    element.innerHTML="";
+    if(!Array.isArray(items)||items.length===0){
+        element.innerHTML="<p>None found.</p>";return;
+    }
+    items.forEach(item=>{
+        const div=document.createElement("div");
+        div.className=className;
+        div.innerText=item;
+        element.appendChild(div);
+    });
+}
+
+function saveHistory(filename,score,match){
+    let history=JSON.parse(localStorage.getItem("resumeHistory"))||[];
+    history.unshift({filename,score,match,date:new Date().toLocaleString()});
+    history=history.slice(0,10);
+    localStorage.setItem("resumeHistory",JSON.stringify(history));
+    displayHistory();
+}
+
+function displayHistory(){
+    const historyElement=document.getElementById("historyList");
+    const history=JSON.parse(localStorage.getItem("resumeHistory"))||[];
+    historyElement.innerHTML="";
+    if(history.length===0){
+        historyElement.innerHTML="<p class='empty-history'>No resume analysis history yet.</p>";return;
+    }
+    history.forEach(item=>{
+        const div=document.createElement("div");
+        div.className="history-item";
+        const title=document.createElement("h3");title.innerText="📄 "+item.filename;
+        const date=document.createElement("p");date.innerText="📅 "+item.date;
+        const score=document.createElement("p");score.className="history-score";score.innerText="Resume Score: "+item.score+"/100";
+        const match=document.createElement("p");match.className="history-match";match.innerText="Job Match: "+item.match+"%";
+        div.append(title,date,score,match);
+        historyElement.appendChild(div);
+    });
+}
+
+function clearHistory(){
+    if(confirm("Are you sure you want to clear your resume history?")){
+        localStorage.removeItem("resumeHistory");
+        displayHistory();
+    }
+}
+
+async function downloadReport(){
+    const formData=new FormData();
+    formData.append("resume_score",document.getElementById("resumeScore").innerText);
+    formData.append("job_match",document.getElementById("jobMatch").innerText.replace("%",""));
+    formData.append("matching_skills",getItems("matchingSkills"));
+    formData.append("missing_skills",getItems("missingSkills"));
+    formData.append("strengths",getItems("strengths"));
+    formData.append("weaknesses",getItems("weaknesses"));
+    formData.append("recommendations",getItems("recommendations"));
+
+    try{
+        const response=await fetch("/download-report",{method:"POST",body:formData});
+        if(!response.ok){alert("Unable to create PDF report.");return;}
+        const blob=await response.blob();
+        const url=window.URL.createObjectURL(blob);
+        const link=document.createElement("a");
+        link.href=url;link.download="resume_analysis.pdf";
+        document.body.appendChild(link);link.click();link.remove();
+        window.URL.revokeObjectURL(url);
+    }catch(error){
+        console.error(error);
+        alert("Unable to download report.");
+    }
+}
+
+function getItems(elementId){
+    const element=document.getElementById(elementId);
+    const values=[];
+    for(let i=0;i<element.children.length;i++){
+        const text=element.children[i].innerText.trim();
+        if(text) values.push(text);
+    }
+    return values.join("|||");
+}
+
+
+/* ===== FINAL PROFESSIONAL INTERACTION ANIMATIONS ===== */
+const scrollTopButton=document.getElementById("scrollTop");
+window.addEventListener("scroll",()=>{
+  scrollTopButton.classList.toggle("show",window.scrollY>500);
+  const sections=["home","analyze","history","about"];
+  let current="home";
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && window.scrollY>=el.offsetTop-150) current=id;
+  });
+  document.querySelectorAll(".nav-links a").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+current));
+},{passive:true});
+scrollTopButton.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+
+const revealObserver=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){entry.target.classList.add("visible");revealObserver.unobserve(entry.target)}
+  });
+},{threshold:.12});
+document.querySelectorAll(".features,.stats,.card").forEach((el,i)=>{
+  if(!el.classList.contains("hero")){el.classList.add("reveal-on-scroll");el.style.transitionDelay=Math.min(i*.035,.28)+"s";revealObserver.observe(el)}
+});
+
+function addRipple(e){
+  const btn=e.currentTarget;
+  const rect=btn.getBoundingClientRect();
+  const ripple=document.createElement("span");
+  const size=Math.max(rect.width,rect.height)*.45;
+  ripple.className="ripple";
+  ripple.style.width=size+"px";ripple.style.height=size+"px";
+  ripple.style.left=(e.clientX-rect.left-size/2)+"px";
+  ripple.style.top=(e.clientY-rect.top-size/2)+"px";
+  btn.appendChild(ripple);
+  setTimeout(()=>ripple.remove(),700);
+}
+document.querySelectorAll(".start-button,.secondary-button,.browse-button,.analyze-button,.download button,.clear-button").forEach(btn=>btn.addEventListener("click",addRipple));
+
+function cardTilt(el){
+  if(window.matchMedia("(pointer:fine)").matches){
+    el.addEventListener("mousemove",e=>{
+      const r=el.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5;
+      const y=(e.clientY-r.top)/r.height-.5;
+      el.style.transform=`perspective(900px) rotateX(${(-y*2.2).toFixed(2)}deg) rotateY(${(x*2.2).toFixed(2)}deg) translateY(-4px)`;
+    });
+    el.addEventListener("mouseleave",()=>el.style.transform="");
+  }
+}
+document.querySelectorAll(".feature-card,.stat,.score-card").forEach(cardTilt);
+
+const originalShowItems=showItems;
+showItems=function(elementId,items,className){
+  originalShowItems(elementId,items,className);
+  const container=document.getElementById(elementId);
+  [...container.children].forEach((child,i)=>{
+    child.classList.add("item-reveal");
+    child.style.animationDelay=Math.min(i*.055,.55)+"s";
+  });
+};
+
+const originalSaveHistory=saveHistory;
+saveHistory=function(filename,score,match){
+  originalSaveHistory(filename,score,match);
+  requestAnimationFrame(()=>{
+    document.querySelectorAll("#historyList .history-item").forEach((item,i)=>{
+      item.classList.add("item-reveal");
+      item.style.setProperty("--delay",Math.min(i*.06,.5)+"s");
+    });
+  });
+};
+
+const originalAnimateCircle=animateCircle;
+animateCircle=function(circle,percent,fromColor,toColor){
+  circle.classList.remove("score-complete");
+  void circle.offsetWidth;
+  originalAnimateCircle(circle,percent,fromColor,toColor);
+  setTimeout(()=>circle.classList.add("score-complete"),1250);
+};
+
+const originalAnalyze=analyze;
+analyze=async function(){
+  const btn=document.getElementById("analyzeButton");
+  btn.dataset.originalText=btn.innerHTML;
+  await originalAnalyze();
+};
+
+// Smooth anchor navigation with a small focus cue.
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",()=>{
+  const target=document.querySelector(a.getAttribute("href"));
+  if(target){setTimeout(()=>{target.animate([{boxShadow:"0 0 0 0 rgba(37,99,235,0)"},{boxShadow:"0 0 0 7px rgba(37,99,235,.10)"},{boxShadow:"0 0 0 0 rgba(37,99,235,0)"}],{duration:650,easing:"ease-out"})},450)}
+}));
+
+
+displayHistory();
+
+
+/* ===== DARK MODE ===== */
+const darkModeBtn=document.getElementById("darkModeBtn");
+
+function updateDarkModeButton(){
+    if(!darkModeBtn) return;
+    darkModeBtn.innerHTML=document.body.classList.contains("dark-mode")
+        ? "☀️ Light Mode"
+        : "🌙 Dark Mode";
+}
+
+function toggleDarkMode(){
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem(
+        "darkMode",
+        document.body.classList.contains("dark-mode") ? "enabled" : "disabled"
+    );
+    updateDarkModeButton();
+}
+
+if(localStorage.getItem("darkMode")==="enabled"){
+    document.body.classList.add("dark-mode");
+}
+
+if(darkModeBtn){
+    darkModeBtn.addEventListener("click",toggleDarkMode);
+    updateDarkModeButton();
+}
+</script>
+</body>
+</html>
